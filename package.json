@@ -1,19 +1,21 @@
 {
   "name": "malmo-klatterklubb",
-  "private": true,
   "version": "1.0.0",
-  "main": "package.json",
+  "private": true,
+  "keywords": [
+    "sanity"
+  ],
   "license": "UNLICENSED",
+  "main": "package.json",
   "scripts": {
     "build": "sanity build",
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "dev": "sanity dev",
-    "start": "sanity start"
+    "start": "sanity start",
+    "test": "vitest run",
+    "watch": "vitest"
   },
-  "keywords": [
-    "sanity"
-  ],
   "dependencies": {
     "@sanity/icons": "^3.7.4",
     "@sanity/locale-sv-se": "^1.2.30",
