@@ -47,13 +47,16 @@ export const navItemChild = defineType({
     }),
     defineField({
       name: 'externalUrl',
-      title: 'External URL',
-      type: 'url',
+      title: 'URL',
+      description: 'A relative URL, e.g. /about or /news/latest.',
+      type: 'string',
       hidden: ({parent}) => parent?.linkType !== 'external',
       validation: (rule) =>
-        rule.uri({scheme: ['http', 'https']}).custom((value, ctx) => {
+        rule.custom((value, ctx) => {
           const parent = ctx.parent as {linkType?: string}
-          if (parent?.linkType === 'external' && !value) return 'Required'
+          if (parent?.linkType !== 'external') return true
+          if (!value) return 'Required'
+          if (!/^\//.test(value)) return 'Must be a relative URL starting with /'
           return true
         }),
     }),
@@ -122,13 +125,16 @@ export const navItem = defineType({
     }),
     defineField({
       name: 'externalUrl',
-      title: 'External URL',
-      type: 'url',
+      title: 'URL',
+      description: 'A relative URL, e.g. /about or /news/latest.',
+      type: 'string',
       hidden: ({parent}) => parent?.linkType !== 'external',
       validation: (rule) =>
-        rule.uri({scheme: ['http', 'https']}).custom((value, ctx) => {
+        rule.custom((value, ctx) => {
           const parent = ctx.parent as {linkType?: string}
-          if (parent?.linkType === 'external' && !value) return 'Required'
+          if (parent?.linkType !== 'external') return true
+          if (!value) return 'Required'
+          if (!/^\//.test(value)) return 'Must be a relative URL starting with /'
           return true
         }),
     }),
