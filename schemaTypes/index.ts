@@ -5,6 +5,7 @@ import {post} from './documents/post'
 import {eventPart} from './objects/eventPart'
 import {navItem, navItemChild} from './objects/navItem'
 import {portableText} from './objects/portableText'
+import {person} from './documents/person'
 
 export const schemaTypes = [
   config,
@@ -15,4 +16,5 @@ export const schemaTypes = [
   portableText,
   navItem,
   navItemChild,
+  person,
 ]
