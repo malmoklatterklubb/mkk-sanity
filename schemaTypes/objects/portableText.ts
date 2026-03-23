@@ -43,7 +43,7 @@ export const portableText = defineType({
                 title: 'Internal Link',
                 type: 'reference',
                 // Add document types here as you create them
-                to: [{type: 'page'}, {type: 'post'}],
+                to: [{type: 'page'}, {type: 'post'}, {type: 'event'}],
                 hidden: ({parent}) => parent?.linkType !== 'internal',
               }),
               defineField({

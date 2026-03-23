@@ -36,7 +36,7 @@ export const navItemChild = defineType({
       title: 'Internal Link',
       description: 'Link to a document in this Sanity project.',
       type: 'reference',
-      to: [{type: 'page'}, {type: 'post'}],
+      to: [{type: 'page'}, {type: 'post'}, {type: 'event'}],
       hidden: ({parent}) => parent?.linkType !== 'internal',
       validation: (rule) =>
         rule.custom((value, ctx) => {
@@ -114,7 +114,7 @@ export const navItem = defineType({
       title: 'Internal Link',
       description: 'Link to a document in this Sanity project.',
       type: 'reference',
-      to: [{type: 'page'}, {type: 'post'}],
+      to: [{type: 'page'}, {type: 'post'}, {type: 'event'}],
       hidden: ({parent}) => parent?.linkType !== 'internal',
       validation: (rule) =>
         rule.custom((value, ctx) => {

@@ -1,13 +1,8 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {CalendarIcon} from '@sanity/icons'
 
-const categoryList = [
-  {title: 'Topprepskurs', value: 'topprepskurs'},
-  {title: 'Ledkurs', value: 'ledkurs'},
-  {title: 'Uppklättring', value: 'uppklattring'},
-  {title: 'Prova på', value: 'prova-pa'},
-  {title: 'Övrigt', value: 'ovrigt'},
-]
+import {AutoTitleInput} from '../components/AutoTitleInput'
+import {computeEventTitle, eventCategories} from '../lib/eventCategories'
 
 export const event = defineType({
   name: 'event',
@@ -16,10 +11,16 @@ export const event = defineType({
   icon: CalendarIcon,
   fields: [
     defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      options: {list: [...eventCategories]},
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (rule) => rule.required(),
+      components: {input: AutoTitleInput},
     }),
     defineField({
       name: 'slug',
@@ -27,12 +28,6 @@ export const event = defineType({
       type: 'slug',
       options: {source: 'title'},
       validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'category',
-      title: 'Category',
-      type: 'string',
-      options: {list: categoryList},
     }),
     defineField({
       name: 'parts',
@@ -69,6 +64,12 @@ export const event = defineType({
       description: 'Link to the booking page, e.g. on Fienta.',
       type: 'url',
       hidden: ({parent}) => !parent?.acceptsBookings,
+      validation: (rule) =>
+        rule.uri({scheme: ['http', 'https']}).custom((value, ctx) => {
+          const parent = ctx.parent as {acceptsBookings?: boolean}
+          if (parent?.acceptsBookings && !value) return 'Required when bookings are enabled.'
+          return true
+        }),
     }),
   ],
   preview: {
@@ -78,9 +79,10 @@ export const event = defineType({
       category: 'category',
     },
     prepare({title, firstPartStart, category}) {
-      const categoryLabel = categoryList.find((c) => c.value === category)?.title
+      const categoryLabel = eventCategories.find((c) => c.value === category)?.title
+      const autoTitle = computeEventTitle(category, firstPartStart)
       return {
-        title,
+        title: title ?? autoTitle ?? 'Untitled event',
         subtitle: [
           firstPartStart ? new Date(firstPartStart).toLocaleDateString('sv-SE') : null,
           categoryLabel ?? null,

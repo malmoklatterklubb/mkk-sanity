@@ -26,6 +26,7 @@ export default defineConfig({
           .items([
             S.documentTypeListItem('page').title('Pages'),
             S.documentTypeListItem('post').title('Posts'),
+            S.documentTypeListItem('event').title('Events'),
             S.divider(),
             S.listItem()
               .title('Settings')
