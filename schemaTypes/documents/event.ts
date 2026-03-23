@@ -61,15 +61,10 @@ export const event = defineType({
     defineField({
       name: 'bookingUrl',
       title: 'Booking URL',
-      description: 'Link to the booking page, e.g. on Fienta.',
+      description:
+        'Link to the booking page, e.g. on Fienta. Leave blank and let the website create the booking page for you.',
       type: 'url',
       hidden: ({parent}) => !parent?.acceptsBookings,
-      validation: (rule) =>
-        rule.uri({scheme: ['http', 'https']}).custom((value, ctx) => {
-          const parent = ctx.parent as {acceptsBookings?: boolean}
-          if (parent?.acceptsBookings && !value) return 'Required when bookings are enabled.'
-          return true
-        }),
     }),
   ],
   preview: {
