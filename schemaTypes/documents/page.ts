@@ -3,7 +3,7 @@ import {DocumentIcon} from '@sanity/icons'
 
 export const page = defineType({
   name: 'page',
-  title: 'Pages',
+  title: 'Page',
   type: 'document',
   icon: DocumentIcon,
   fields: [
