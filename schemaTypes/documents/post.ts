@@ -3,7 +3,7 @@ import {DocumentTextIcon} from '@sanity/icons'
 
 export const post = defineType({
   name: 'post',
-  title: 'Post',
+  title: 'Posts',
   type: 'document',
   icon: DocumentTextIcon,
   fields: [
@@ -37,8 +37,7 @@ export const post = defineType({
       description: 'A short summary used in listings and previews.',
       type: 'text',
       rows: 3,
-      validation: (rule) =>
-        rule.max(200).warning('Keep under 200 characters for best results.'),
+      validation: (rule) => rule.max(200).warning('Keep under 200 characters for best results.'),
     }),
     defineField({
       name: 'body',
@@ -55,9 +54,7 @@ export const post = defineType({
     prepare({title, publishedAt, media}) {
       return {
         title,
-        subtitle: publishedAt
-          ? new Date(publishedAt).toLocaleDateString('sv-SE')
-          : 'No date set',
+        subtitle: publishedAt ? new Date(publishedAt).toLocaleDateString('sv-SE') : 'No date set',
         media,
       }
     },
