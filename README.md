@@ -1,4 +1,4 @@
-# leve-sanity
+# mkk-sanity
 
 Sanity Studio for [Malmö Klätterklubb](https://malmoklatterklubb.se).
 
