@@ -38,6 +38,14 @@ export const event = defineType({
       validation: (rule) => rule.required().min(1).error('At least one part is required.'),
     }),
     defineField({
+      name: 'owner',
+      title: 'Owner',
+      description: 'Booking emails will be sent to this person.',
+      type: 'reference',
+      to: [{type: 'person'}],
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'acceptsBookings',
       title: 'Accepts bookings',
       type: 'boolean',
@@ -72,18 +80,13 @@ export const event = defineType({
       title: 'title',
       firstPartStart: 'parts.0.start',
       category: 'category',
+      owner: 'owner.firstName',
     },
-    prepare({title, firstPartStart, category}) {
-      const categoryLabel = eventCategories.find((c) => c.value === category)?.title
+    prepare({title, firstPartStart, category, owner}) {
       const autoTitle = computeEventTitle(category, firstPartStart)
       return {
         title: title ?? autoTitle ?? 'Untitled event',
-        subtitle: [
-          firstPartStart ? new Date(firstPartStart).toLocaleDateString('sv-SE') : null,
-          categoryLabel ?? null,
-        ]
-          .filter(Boolean)
-          .join(' · '),
+        subtitle: owner,
         media: CalendarIcon,
       }
     },
