@@ -15,6 +15,8 @@
     "sanity"
   ],
   "dependencies": {
+    "@sanity/icons": "^3.7.4",
+    "@sanity/locale-sv-se": "^1.2.30",
     "@sanity/vision": "^5.17.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -23,15 +25,12 @@
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "^6.0.0",
+    "@sanity/prettier-config": "^3.0.0",
     "@types/react": "^19.2.14",
     "eslint": "^9.28",
     "prettier": "^3.5",
-    "typescript": "^5.8"
-  },
-  "prettier": {
-    "bracketSpacing": false,
-    "printWidth": 100,
-    "semi": false,
-    "singleQuote": true
+    "typescript": "^5.8",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.0"
   }
 }
