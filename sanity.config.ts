@@ -2,7 +2,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
-import { svSELocale } from '@sanity/locale-sv-se'
+// import {svSELocale} from '@sanity/locale-sv-se'
 
 export default defineConfig({
   name: 'default',
@@ -11,7 +11,11 @@ export default defineConfig({
   projectId: 'dajcvves',
   dataset: 'production',
 
-  plugins: [structureTool(), svSELocale(), visionTool()],
+  plugins: [
+    structureTool(),
+    // svSELocale(),
+    visionTool(),
+  ],
 
   schema: {
     types: schemaTypes,
