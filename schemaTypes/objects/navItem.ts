@@ -1,5 +1,14 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
+import z from 'zod'
+
+const contextSchema = z.object({
+  parent: z
+    .object({
+      linkType: z.string().optional(),
+    })
+    .optional(),
+})
 
 /**
  * Leaf-level nav item — can link internally or externally, but has no children.
@@ -37,10 +46,10 @@ export const navItemChild = defineType({
       description: 'Link to a document in this Sanity project.',
       type: 'reference',
       to: [{type: 'page'}, {type: 'post'}, {type: 'event'}],
-      hidden: ({parent}) => parent?.linkType !== 'internal',
+      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'internal',
       validation: (rule) =>
         rule.custom((value, ctx) => {
-          const parent = ctx.parent as {linkType?: string}
+          const parent = contextSchema.parse(ctx).parent
           if (parent?.linkType === 'internal' && !value) return 'Required'
           return true
         }),
@@ -50,10 +59,10 @@ export const navItemChild = defineType({
       title: 'URL',
       description: 'A relative URL, e.g. /about or /news/latest.',
       type: 'string',
-      hidden: ({parent}) => parent?.linkType !== 'external',
+      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'external',
       validation: (rule) =>
         rule.custom((value, ctx) => {
-          const parent = ctx.parent as {linkType?: string}
+          const parent = contextSchema.parse(ctx).parent
           if (parent?.linkType !== 'external') return true
           if (!value) return 'Required'
           if (!/^\//.test(value)) return 'Must be a relative URL starting with /'
@@ -115,10 +124,10 @@ export const navItem = defineType({
       description: 'Link to a document in this Sanity project.',
       type: 'reference',
       to: [{type: 'page'}, {type: 'post'}, {type: 'event'}],
-      hidden: ({parent}) => parent?.linkType !== 'internal',
+      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'internal',
       validation: (rule) =>
         rule.custom((value, ctx) => {
-          const parent = ctx.parent as {linkType?: string}
+          const parent = contextSchema.parse(ctx).parent
           if (parent?.linkType === 'internal' && !value) return 'Required'
           return true
         }),
@@ -128,10 +137,10 @@ export const navItem = defineType({
       title: 'URL',
       description: 'A relative URL, e.g. /about or /news/latest.',
       type: 'string',
-      hidden: ({parent}) => parent?.linkType !== 'external',
+      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'external',
       validation: (rule) =>
         rule.custom((value, ctx) => {
-          const parent = ctx.parent as {linkType?: string}
+          const parent = contextSchema.parse(ctx).parent
           if (parent?.linkType !== 'external') return true
           if (!value) return 'Required'
           if (!/^\//.test(value)) return 'Must be a relative URL starting with /'

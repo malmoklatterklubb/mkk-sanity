@@ -4,6 +4,7 @@ import React from 'react'
 import {type StringInputProps, useFormValue} from 'sanity'
 import {beforeEach, describe, expect, it, vi} from 'vitest'
 import {AutoTitleInput} from './AutoTitleInput'
+import z from 'zod'
 
 // Mocks — implementations live in __mocks__/ next to node_modules
 vi.mock('@sanity/ui')
@@ -18,7 +19,7 @@ type EventPart = {_key?: string; start?: string}
  */
 function setupFormValues(category?: string, parts?: EventPart[]) {
   vi.mocked(useFormValue).mockImplementation((path: unknown) => {
-    const [field] = path as string[]
+    const [field] = z.array(z.string()).parse(path)
     if (field === 'category') return category
     if (field === 'parts') return parts
     return undefined

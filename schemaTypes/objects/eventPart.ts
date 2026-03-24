@@ -1,5 +1,14 @@
 import {defineField, defineType} from 'sanity'
 import {ClockIcon} from '@sanity/icons'
+import z from 'zod'
+
+const contextSchema = z.object({
+  parent: z
+    .object({
+      start: z.string().optional(),
+    })
+    .optional(),
+})
 
 export const eventPart = defineType({
   name: 'eventPart',
@@ -21,7 +30,7 @@ export const eventPart = defineType({
       options: {timeStep: 15},
       validation: (rule) =>
         rule.required().custom((end, ctx) => {
-          const parent = ctx.parent as {start?: string}
+          const parent = contextSchema.parse(ctx).parent
           if (parent?.start && end && new Date(end) <= new Date(parent.start)) {
             return 'End must be after start'
           }

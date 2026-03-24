@@ -1,8 +1,16 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {CalendarIcon} from '@sanity/icons'
-
 import {AutoTitleInput} from '../components/AutoTitleInput'
 import {computeEventTitle, eventCategories} from '../lib/eventCategories'
+import z from 'zod'
+
+const contextSchema = z.object({
+  parent: z
+    .object({
+      acceptsBookings: z.boolean().optional(),
+    })
+    .optional(),
+})
 
 export const event = defineType({
   name: 'event',
@@ -56,10 +64,10 @@ export const event = defineType({
       title: 'Available spots',
       type: 'number',
       initialValue: 4,
-      hidden: ({parent}) => !parent?.acceptsBookings,
+      hidden: (ctx) => !contextSchema.parse(ctx).parent?.acceptsBookings,
       validation: (rule) =>
         rule.custom((value, ctx) => {
-          const parent = ctx.parent as {acceptsBookings?: boolean}
+          const parent = contextSchema.parse(ctx).parent
           if (parent?.acceptsBookings && (value === undefined || value === null))
             return 'Required when bookings are enabled.'
           if (value !== undefined && value !== null && value < 1) return 'Must be at least 1.'
@@ -72,7 +80,7 @@ export const event = defineType({
       description:
         'Link to the booking page, e.g. on Fienta. Leave blank and let the website create the booking page for you.',
       type: 'url',
-      hidden: ({parent}) => !parent?.acceptsBookings,
+      hidden: (ctx) => !contextSchema.parse(ctx).parent?.acceptsBookings,
     }),
   ],
   preview: {

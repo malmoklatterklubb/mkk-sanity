@@ -3,14 +3,18 @@ import {Box, Button, Flex, Stack, TextInput} from '@sanity/ui'
 import React, {useCallback, useEffect, useMemo} from 'react'
 import {set, unset, useFormValue, type StringInputProps} from 'sanity'
 import {computeEventTitle} from '../lib/eventCategories'
+import z from 'zod'
 
-type EventPart = {_key?: string; start?: string}
+const categorySchema = z.string().optional()
+const eventPartSchema = z.object({_key: z.string().optional(), start: z.string().optional()})
+const eventPartsSchema = z.array(eventPartSchema).optional()
 
 export function AutoTitleInput(props: StringInputProps) {
   const {value, onChange, readOnly, elementProps} = props
 
-  const category = useFormValue(['category']) as string | undefined
-  const parts = useFormValue(['parts']) as EventPart[] | undefined
+  const category = categorySchema.parse(useFormValue(['category']))
+  const parts = eventPartsSchema.parse(useFormValue(['parts']))
+
   const firstStart = parts?.[0]?.start
 
   const computedTitle = useMemo(
