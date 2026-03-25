@@ -1,8 +1,8 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
-import {CogIcon} from '@sanity/icons'
 import {schemaTypes} from './schemaTypes'
+import {structure} from './structure'
 
 // https://www.sanity.io/guides/singleton-document
 // Actions available on singleton documents
@@ -20,21 +20,7 @@ export default defineConfig({
 
   plugins: [
     structureTool({
-      structure: (S) =>
-        S.list()
-          .title('Content')
-          .items([
-            S.documentTypeListItem('page').title('Pages'),
-            S.documentTypeListItem('post').title('Posts'),
-            S.documentTypeListItem('event').title('Events'),
-            S.documentTypeListItem('person').title('People'),
-            S.divider(),
-            S.listItem()
-              .title('Settings')
-              .id('config')
-              .icon(CogIcon)
-              .child(S.document().schemaType('config').documentId('config')),
-          ]),
+      structure,
     }),
     visionTool(),
   ],
