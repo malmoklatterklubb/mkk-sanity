@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {CalendarIcon} from '@sanity/icons'
+import {CalendarIcon, CheckmarkIcon} from '@sanity/icons'
 import {AutoTitleInput} from '../components/AutoTitleInput'
 import {computeEventTitle, eventCategories} from '../lib/eventCategories'
 import z from 'zod'
@@ -89,13 +89,15 @@ export const event = defineType({
       firstPartStart: 'parts.0.start',
       category: 'category',
       owner: 'owner.firstName',
+      starts: 'parts.0.start',
     },
-    prepare({title, firstPartStart, category, owner}) {
+    prepare({title, firstPartStart, category, owner, starts}) {
       const autoTitle = computeEventTitle(category, firstPartStart)
+      const isPast = starts < new Date().toISOString()
       return {
         title: title ?? autoTitle ?? 'Untitled event',
         subtitle: owner,
-        media: CalendarIcon,
+        media: isPast ? CheckmarkIcon : CalendarIcon,
       }
     },
   },
