@@ -1,27 +1,27 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {CogIcon} from '@sanity/icons'
 
-export const config = defineType({
-  name: 'config',
-  title: 'Settings',
+export const siteSettings = defineType({
+  name: 'siteSettings',
+  title: 'Site Settings',
   type: 'document',
   icon: CogIcon,
   fields: [
     defineField({
       name: 'siteTitle',
-      title: 'Site Title',
+      title: 'Site title',
       type: 'string',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'siteDescription',
-      title: 'Site Description',
+      title: 'Site description',
       type: 'text',
       rows: 3,
     }),
     defineField({
       name: 'contactInfo',
-      title: 'Contact Information',
+      title: 'Contact information',
       type: 'object',
       fields: [
         defineField({
@@ -55,10 +55,7 @@ export const config = defineType({
       title: 'siteTitle',
     },
     prepare({title}) {
-      return {
-        title: title ?? 'Site Configuration',
-        subtitle: 'Global site settings',
-      }
+      return {title: title ?? 'Site Settings'}
     },
   },
 })

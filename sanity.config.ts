@@ -9,7 +9,7 @@ import {structure} from './structure'
 const singletonActions = new Set(['publish', 'discardChanges', 'restore'])
 
 // Document types treated as singletons
-const singletonTypes = new Set(['config'])
+const singletonTypes = new Set(['homePage', 'siteSettings'])
 
 export default defineConfig({
   name: 'default',

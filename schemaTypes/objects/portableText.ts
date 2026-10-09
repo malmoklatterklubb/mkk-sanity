@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {UsersIcon} from '@sanity/icons'
 
 export const portableText = defineType({
   name: 'portableText',
@@ -42,8 +43,7 @@ export const portableText = defineType({
                 name: 'internalLink',
                 title: 'Internal Link',
                 type: 'reference',
-                // Add document types here as you create them
-                to: [{type: 'page'}, {type: 'post'}, {type: 'event'}],
+                to: [{type: 'page'}, {type: 'post'}, {type: 'section'}],
                 hidden: ({parent}) => parent?.linkType !== 'internal',
               }),
               defineField({
@@ -61,6 +61,42 @@ export const portableText = defineType({
     defineArrayMember({
       type: 'image',
       options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative text',
+          type: 'string',
+          validation: (rule) => rule.required().warning('Add alternative text for this image.'),
+        }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+        }),
+      ],
+    }),
+    defineArrayMember({
+      name: 'sectionReference',
+      title: 'Committee',
+      type: 'object',
+      icon: UsersIcon,
+      fields: [
+        defineField({
+          name: 'section',
+          title: 'Committee',
+          type: 'reference',
+          to: [{type: 'section'}],
+          validation: (rule) => rule.required(),
+        }),
+      ],
+      preview: {
+        select: {
+          title: 'section.title',
+        },
+        prepare({title}) {
+          return {title: title ?? 'Committee'}
+        },
+      },
     }),
   ],
 })

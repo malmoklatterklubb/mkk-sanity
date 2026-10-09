@@ -1,28 +1,23 @@
-import {defineField, defineType} from 'sanity'
-import {UsersIcon} from '@sanity/icons'
+import {defineArrayMember, defineField, defineType} from 'sanity'
+import {UserIcon} from '@sanity/icons'
 
 export const person = defineType({
   name: 'person',
   title: 'Person',
   type: 'document',
-  icon: UsersIcon,
+  icon: UserIcon,
   fields: [
     defineField({
-      name: 'firstName',
-      title: 'First name',
+      name: 'name',
+      title: 'Name',
       type: 'string',
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'lastName',
-      title: 'Last name',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'role',
-      title: 'Role',
-      type: 'string',
+      name: 'bio',
+      title: 'Short bio',
+      type: 'text',
+      rows: 3,
     }),
     defineField({
       name: 'email',
@@ -32,10 +27,17 @@ export const person = defineType({
     }),
     defineField({
       name: 'hideEmail',
-      title: 'Private',
+      title: 'Private email',
       type: 'boolean',
-      description: 'Hide email from public view',
       initialValue: false,
+    }),
+    defineField({
+      name: 'roles',
+      title: 'Roles',
+      description: 'Assign roles. Committee membership is derived from assigned roles.',
+      type: 'array',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'role'}]})],
+      options: {layout: 'tags'},
     }),
     defineField({
       name: 'image',
@@ -45,16 +47,21 @@ export const person = defineType({
   ],
   preview: {
     select: {
-      firstName: 'firstName',
-      lastName: 'lastName',
+      name: 'name',
       image: 'image',
-      role: 'role',
+      role0: 'roles.0.title',
+      role1: 'roles.1.title',
+      role2: 'roles.2.title',
+      role3: 'roles.3.title',
     },
-    prepare({firstName, lastName, image, role}) {
+    prepare({name, image, role0, role1, role2, role3}) {
+      const roles = [role0, role1, role2].filter(Boolean)
+      const subtitle = roles.length === 0 ? 'No roles' : roles.join(', ')
+
       return {
-        title: `${firstName} ${lastName}`,
+        title: name ?? 'Untitled person',
         media: image,
-        subtitle: role,
+        subtitle: role3 ? `${subtitle} …` : subtitle,
       }
     },
   },

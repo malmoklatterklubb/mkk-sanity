@@ -26,10 +26,24 @@ export const post = defineType({
       type: 'datetime',
     }),
     defineField({
+      name: 'author',
+      title: 'Author',
+      type: 'reference',
+      to: [{type: 'person'}],
+    }),
+    defineField({
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
       options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative text',
+          type: 'string',
+          validation: (rule) => rule.required().warning('Add alternative text for this image.'),
+        }),
+      ],
     }),
     defineField({
       name: 'excerpt',
@@ -40,9 +54,14 @@ export const post = defineType({
       validation: (rule) => rule.max(200).warning('Keep under 200 characters for best results.'),
     }),
     defineField({
-      name: 'body',
-      title: 'Body',
+      name: 'content',
+      title: 'Content',
       type: 'portableText',
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
     }),
   ],
   preview: {
@@ -54,7 +73,7 @@ export const post = defineType({
     prepare({title, publishedAt, media}) {
       return {
         title,
-        subtitle: publishedAt ? new Date(publishedAt).toLocaleDateString('sv-SE') : 'No date set',
+        subtitle: publishedAt ? new Date(publishedAt).toLocaleDateString('en-GB') : 'No date set',
         media,
       }
     },

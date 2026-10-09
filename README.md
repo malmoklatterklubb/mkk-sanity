@@ -8,9 +8,9 @@ The studio is hosted at [mkk.sanity.studio](https://mkk.sanity.studio) and manag
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Querying content](docs/querying.md) | GROQ primer, schema reference, and how to query from the Astro site |
+| Document                          | Description                                              |
+| --------------------------------- | -------------------------------------------------------- |
+| [Content model](docs/querying.md) | Studio content types, Portable Text, and migration notes |
 
 ---
 
@@ -41,25 +41,40 @@ The studio will be available at `http://localhost:3333`.
 
 ## Available scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start the local development server |
-| `npm run build` | Build the studio for production |
-| `npm run deploy` | Deploy the studio to Sanity's hosted infrastructure |
-| `npm run deploy-graphql` | Deploy the GraphQL API |
+| Script                   | Description                                         |
+| ------------------------ | --------------------------------------------------- |
+| `npm run dev`            | Start the local development server                  |
+| `npm run build`          | Build the studio for production                     |
+| `npm run deploy`         | Deploy the studio to Sanity's hosted infrastructure |
+| `npm run deploy-graphql` | Deploy the GraphQL API                              |
 
 ---
 
 ## Schemas
 
-Content types defined in `schemas/`:
+Content types are defined in `schemaTypes/`:
 
-| Schema | Description |
-|--------|-------------|
-| `page` | Generic content pages |
-| `post` | News articles |
-| `event` | Courses, events and happenings. |
-| `config` | Singleton site configuration |
+| Schema         | Description                                       |
+| -------------- | ------------------------------------------------- |
+| `page`         | Generic content pages                             |
+| `post`         | News articles                                     |
+| `person`       | People involved in the club                       |
+| `section`      | Club sections, such as courses or IT              |
+| `role`         | Reusable roles, optionally belonging to a section |
+| `homePage`     | Homepage singleton                                |
+| `siteSettings` | Shared site configuration singleton               |
+
+Events are managed in Fienta and are intentionally not part of this Studio.
+
+## Content migrations
+
+Field migrations live in [`migrations/`](migrations/). Always run them in dry-run mode first:
+
+```sh
+npx sanity migrations run 2026-04-content-architecture
+```
+
+See [`migrations/README.md`](migrations/README.md) for the required manual steps when changing document types.
 
 ---
 
@@ -70,18 +85,19 @@ The studio is automatically deployed via the GitHub Actions workflow defined in 
 ### Trigger
 
 The workflow runs on:
+
 - Every push to the `main` branch
 - Manual dispatch via the GitHub Actions UI (`workflow_dispatch`)
 
 ### Steps
 
-1. **Checkout** — checks out the repository using `actions/checkout@v4`.
+1. **Checkout** — checks out the repository using `actions/checkout@v6`.
 2. **Setup Node.js** — installs the Node.js version specified in `.node-version` and restores the `npm` cache.
 3. **Install dependencies** — runs `npm install`.
 4. **Deploy Studio** — runs `npx sanity deploy`, which builds and uploads the studio to Sanity's hosting at `mkk.sanity.studio`.
 
 ### Required secrets
 
-| Secret | Description |
-|--------|-------------|
+| Secret                | Description                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `SANITY_DEPLOY_TOKEN` | A Sanity API token with deploy permissions. Set this in the repository's **Settings → Secrets and variables → Actions**. |
