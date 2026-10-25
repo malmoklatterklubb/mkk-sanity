@@ -1,6 +1,6 @@
 # Content Model
 
-This repository contains the Sanity Studio schema. The Astro frontend lives in the separate `mkk-astro` repository and currently has no Sanity queries.
+This repository contains the Sanity Studio schema. The Astro frontend lives in the separate `mkk-astro` repository and currently has no Sanity queries or routes to update.
 
 ## Document Types
 
@@ -18,21 +18,53 @@ Events are managed in Fienta and are not modelled in this Studio.
 
 ## Portable Text
 
-Editorial `content` fields support paragraphs, headings, lists, quotes, internal and external links, images with alternative text, and section reference blocks. Queries that render Portable Text must project the referenced section when handling a `sectionReference` block.
+Editorial Portable Text is localised as a whole. Resolve the requested language first and fall back to Swedish only when the requested field is empty:
+
+```groq
+coalesce(content[_key == $language][0].value, content[_key == "sv"][0].value)
+```
+
+Portable Text supports paragraphs, headings, lists, quotes, internal and external links, images with localised alternative text and captions, and committee reference blocks. Queries that render Portable Text must project the referenced section when handling a `sectionReference` block.
+
+## Localized Fields
+
+Visitor-facing strings, text, Portable Text, SEO copy, navigation labels, image alternative text, captions, and route slugs use `sanity-plugin-internationalized-array`. Swedish is the default language and English is optional.
+
+```groq
+coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value)
+```
+
+Images, references, person names, contact details, dates, roles, `recruiting`, sort order, and other structural fields are shared.
+
+## Routing
+
+Slugs use `{sv: {current}, en: {current}}`. Swedish and English routes must use separate queries:
+
+```groq
+// Swedish route: /{slug}
+*[_type == "page" && slug.sv.current == $slug][0]
+
+// English route: /en/{slug}
+*[_type == "page" && slug.en.current == $slug][0]
+```
+
+Never fall back from an English slug lookup to Swedish. An English route exists only when `slug.en.current` is defined. Individual English fields may fall back to Swedish after the route has resolved.
+
+When generating internal links and `hreflang` tags, use `slug.en.current` only when it exists. Otherwise link to the Swedish route or omit the English alternative.
 
 ## Organisation Queries
 
 Sections derive their roles and members through references. A section does not contain people or roles directly:
 
 ```groq
-*[_type == "section" && slug.current == $slug][0]{
-  title,
-  description,
-  recruitmentInfo,
-  "roles": *[_type == "role" && section._ref == ^._id] | order(sortOrder asc, title asc){
+*[_type == "section" && slug.sv.current == $slug][0]{
+  "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+  "description": coalesce(description[_key == $language][0].value, description[_key == "sv"][0].value),
+  "recruitmentInfo": coalesce(recruitmentInfo[_key == $language][0].value, recruitmentInfo[_key == "sv"][0].value),
+  "roles": *[_type == "role" && section._ref == ^._id] | order(sortOrder asc){
     _id,
-    title,
-    description,
+    "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+    "description": coalesce(description[_key == $language][0].value, description[_key == "sv"][0].value),
     recruiting,
     "people": *[_type == "person" && ^._id in roles[]._ref] | order(name asc){
       _id,
@@ -47,14 +79,24 @@ Sections derive their roles and members through references. A section does not c
 Roles without a section and actively recruiting roles can be queried independently:
 
 ```groq
-*[_type == "role" && !defined(section)] | order(sortOrder asc, title asc){title, description, recruiting}
-*[_type == "role" && recruiting == true] | order(sortOrder asc, title asc){title, section->{title}}
+*[_type == "role" && !defined(section)] | order(sortOrder asc){
+  "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+  "description": coalesce(description[_key == $language][0].value, description[_key == "sv"][0].value),
+  recruiting
+}
+
+*[_type == "role" && recruiting == true] | order(sortOrder asc){
+  "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+  "committee": section->{
+    "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value)
+  }
+}
 ```
 
 ## Image Queries
 
-When rendering an image, project its asset reference together with `alt`, `caption`, `crop`, and `hotspot` where applicable. Use Sanity's image URL builder so editorial hotspot and crop choices are respected.
+When rendering an image, project its asset reference together with `crop` and `hotspot`, then resolve `alt` and `caption` through the same localised-field fallback. Use Sanity's image URL builder so editorial hotspot and crop choices are respected.
 
 ## Migration
 
-See [`../migrations/README.md`](../migrations/README.md) and [`../migrations/section-role-model.md`](../migrations/section-role-model.md) before changing live content. Existing legacy documents are retained until their replacements are deliberately created or migrated.
+See [`../migrations/README.md`](../migrations/README.md), [`../migrations/section-role-model.md`](../migrations/section-role-model.md), and [`../migrations/field-localization.md`](../migrations/field-localization.md) before changing live content. Existing legacy documents are retained until their replacements are deliberately created or migrated.

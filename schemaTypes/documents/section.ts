@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {UsersIcon} from '@sanity/icons'
+import {getLocalizedValue, hasLocalizedValue} from '../lib/localization'
 
 export const section = defineType({
   name: 'section',
@@ -10,34 +11,36 @@ export const section = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'string',
-      validation: (rule) => rule.required(),
+      type: 'internationalizedArrayString',
+      validation: (rule) =>
+        rule.custom((value) => Boolean(hasLocalizedValue(value)) || 'A Swedish title is required.'),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
-      type: 'slug',
-      options: {source: 'title'},
-      validation: (rule) => rule.required(),
+      type: 'localeSlug',
     }),
     defineField({
       name: 'description',
       title: 'Description',
-      type: 'portableText',
+      type: 'internationalizedArrayPortableText',
     }),
     defineField({
       name: 'recruitmentInfo',
       title: 'Recruitment information',
-      type: 'portableText',
+      type: 'internationalizedArrayPortableText',
     }),
   ],
   preview: {
     select: {
       title: 'title',
-      subtitle: 'slug.current',
+      subtitle: 'slug.sv.current',
     },
     prepare({title, subtitle}) {
-      return {title, subtitle: subtitle ? `/${subtitle}` : 'No slug'}
+      return {
+        title: getLocalizedValue(title) ?? 'Untitled committee',
+        subtitle: subtitle ? `/${subtitle}` : 'No slug',
+      }
     },
   },
 })

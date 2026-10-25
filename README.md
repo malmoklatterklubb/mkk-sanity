@@ -8,9 +8,9 @@ The studio is hosted at [mkk.sanity.studio](https://mkk.sanity.studio) and manag
 
 ## Documentation
 
-| Document                          | Description                                              |
-| --------------------------------- | -------------------------------------------------------- |
-| [Content model](docs/querying.md) | Studio content types, Portable Text, and migration notes |
+| Document                          | Description                                                     |
+| --------------------------------- | --------------------------------------------------------------- |
+| [Content model](docs/querying.md) | Studio content types, localization queries, and migration notes |
 
 ---
 
@@ -74,7 +74,7 @@ Field migrations live in [`migrations/`](migrations/). Always run them in dry-ru
 npx sanity migrations run 2026-04-content-architecture
 ```
 
-See [`migrations/README.md`](migrations/README.md) for the required manual steps when changing document types.
+See [`migrations/README.md`](migrations/README.md) for the required manual steps when changing document types, and [`migrations/field-localization.md`](migrations/field-localization.md) before running the field-localization migration.
 
 ---
 

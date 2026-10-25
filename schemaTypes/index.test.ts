@@ -12,6 +12,14 @@ describe('schemaTypes', () => {
     return type?.fields?.map(({name}) => name) ?? []
   }
 
+  function fieldType(typeName: string, fieldName: string) {
+    const type = schemaTypes.find(({name}) => name === typeName) as
+      | {fields?: {name: string; type: string}[]}
+      | undefined
+
+    return type?.fields?.find(({name}) => name === fieldName)?.type
+  }
+
   it('registers the planned content architecture', () => {
     expect(names).toEqual(
       expect.arrayContaining([
@@ -22,6 +30,7 @@ describe('schemaTypes', () => {
         'role',
         'section',
         'siteSettings',
+        'localeSlug',
       ]),
     )
   })
@@ -39,5 +48,14 @@ describe('schemaTypes', () => {
       'sortOrder',
     ])
     expect(fieldNames('person')).toContain('roles')
+  })
+
+  it('uses field-level localized values for visitor-facing content', () => {
+    expect(fieldType('page', 'title')).toBe('internationalizedArrayString')
+    expect(fieldType('page', 'slug')).toBe('localeSlug')
+    expect(fieldType('page', 'content')).toBe('internationalizedArrayPortableText')
+    expect(fieldType('person', 'bio')).toBe('internationalizedArrayText')
+    expect(fieldType('section', 'description')).toBe('internationalizedArrayPortableText')
+    expect(fieldType('role', 'title')).toBe('internationalizedArrayString')
   })
 })

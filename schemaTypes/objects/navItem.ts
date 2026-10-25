@@ -1,6 +1,7 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
 import z from 'zod'
+import {getLocalizedValue} from '../lib/localization'
 
 const contextSchema = z.object({
   parent: z
@@ -23,8 +24,9 @@ export const navItemChild = defineType({
     defineField({
       name: 'label',
       title: 'Label',
-      type: 'string',
-      validation: (rule) => rule.required(),
+      type: 'internationalizedArrayString',
+      validation: (rule) =>
+        rule.custom((value) => Boolean(getLocalizedValue(value)) || 'A Swedish label is required.'),
     }),
     defineField({
       name: 'linkType',
@@ -80,9 +82,9 @@ export const navItemChild = defineType({
     prepare({title, linkType, externalUrl, internalTitle}) {
       const subtitle =
         linkType === 'external' ? externalUrl
-        : internalTitle ? `→ ${internalTitle}`
+        : getLocalizedValue(internalTitle) ? `→ ${getLocalizedValue(internalTitle)}`
         : 'Internal link'
-      return {title, subtitle}
+      return {title: getLocalizedValue(title) ?? 'Untitled navigation item', subtitle}
     },
   },
 })
@@ -100,8 +102,9 @@ export const navItem = defineType({
     defineField({
       name: 'label',
       title: 'Label',
-      type: 'string',
-      validation: (rule) => rule.required(),
+      type: 'internationalizedArrayString',
+      validation: (rule) =>
+        rule.custom((value) => Boolean(getLocalizedValue(value)) || 'A Swedish label is required.'),
     }),
     defineField({
       name: 'linkType',
@@ -171,9 +174,9 @@ export const navItem = defineType({
       const subtitle =
         linkType === 'none' ? `Group${childSuffix}`
         : linkType === 'external' ? `${externalUrl ?? ''}${childSuffix}`
-        : `${internalTitle ? `→ ${internalTitle}` : 'Internal link'}${childSuffix}`
+        : `${getLocalizedValue(internalTitle) ? `→ ${getLocalizedValue(internalTitle)}` : 'Internal link'}${childSuffix}`
 
-      return {title, subtitle}
+      return {title: getLocalizedValue(title) ?? 'Untitled navigation item', subtitle}
     },
   },
 })

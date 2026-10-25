@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {DocumentTextIcon} from '@sanity/icons'
+import {getLocalizedValue, hasLocalizedValue, validateLocalizedImageAlt} from '../lib/localization'
 
 export const post = defineType({
   name: 'post',
@@ -10,15 +11,14 @@ export const post = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'string',
-      validation: (rule) => rule.required(),
+      type: 'internationalizedArrayString',
+      validation: (rule) =>
+        rule.custom((value) => Boolean(hasLocalizedValue(value)) || 'A Swedish title is required.'),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
-      type: 'slug',
-      options: {source: 'title'},
-      validation: (rule) => rule.required(),
+      type: 'localeSlug',
     }),
     defineField({
       name: 'publishedAt',
@@ -40,8 +40,11 @@ export const post = defineType({
         defineField({
           name: 'alt',
           title: 'Alternative text',
-          type: 'string',
-          validation: (rule) => rule.required().warning('Add alternative text for this image.'),
+          type: 'internationalizedArrayString',
+          validation: (rule) =>
+            rule
+              .custom((value, context) => validateLocalizedImageAlt(value, context.parent))
+              .warning(),
         }),
       ],
     }),
@@ -49,14 +52,12 @@ export const post = defineType({
       name: 'excerpt',
       title: 'Excerpt',
       description: 'A short summary used in listings and previews.',
-      type: 'text',
-      rows: 3,
-      validation: (rule) => rule.max(200).warning('Keep under 200 characters for best results.'),
+      type: 'internationalizedArrayText',
     }),
     defineField({
       name: 'content',
       title: 'Content',
-      type: 'portableText',
+      type: 'internationalizedArrayPortableText',
     }),
     defineField({
       name: 'seo',
@@ -72,7 +73,7 @@ export const post = defineType({
     },
     prepare({title, publishedAt, media}) {
       return {
-        title,
+        title: getLocalizedValue(title) ?? 'Untitled post',
         subtitle: publishedAt ? new Date(publishedAt).toLocaleDateString('en-GB') : 'No date set',
         media,
       }

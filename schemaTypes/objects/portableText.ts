@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {UsersIcon} from '@sanity/icons'
+import {getLocalizedValue, validateLocalizedImageAlt} from '../lib/localization'
 
 export const portableText = defineType({
   name: 'portableText',
@@ -13,7 +14,7 @@ export const portableText = defineType({
         {title: 'Heading 2', value: 'h2'},
         {title: 'Heading 3', value: 'h3'},
         {title: 'Heading 4', value: 'h4'},
-        {title: 'Quote', value: 'blockquote'},
+        // {title: 'Quote', value: 'blockquote'},
       ],
       marks: {
         decorators: [
@@ -65,13 +66,16 @@ export const portableText = defineType({
         defineField({
           name: 'alt',
           title: 'Alternative text',
-          type: 'string',
-          validation: (rule) => rule.required().warning('Add alternative text for this image.'),
+          type: 'internationalizedArrayString',
+          validation: (rule) =>
+            rule
+              .custom((value, context) => validateLocalizedImageAlt(value, context.parent))
+              .warning(),
         }),
         defineField({
           name: 'caption',
           title: 'Caption',
-          type: 'string',
+          type: 'internationalizedArrayString',
         }),
       ],
     }),
@@ -94,7 +98,7 @@ export const portableText = defineType({
           title: 'section.title',
         },
         prepare({title}) {
-          return {title: title ?? 'Committee'}
+          return {title: getLocalizedValue(title) ?? 'Committee'}
         },
       },
     }),

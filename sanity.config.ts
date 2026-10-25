@@ -1,7 +1,10 @@
-import {defineConfig} from 'sanity'
+import {defineConfig, isKeySegment} from 'sanity'
+import {languageFilter} from '@sanity/language-filter'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
+import {internationalizedArray} from 'sanity-plugin-internationalized-array'
 import {schemaTypes} from './schemaTypes'
+import {localizedDocumentTypes, supportedLanguages} from './schemaTypes/lib/localization'
 import {structure} from './structure'
 
 // https://www.sanity.io/guides/singleton-document
@@ -19,6 +22,41 @@ export default defineConfig({
   dataset: 'production',
 
   plugins: [
+    internationalizedArray({
+      languages: supportedLanguages,
+      defaultLanguages: ['sv'],
+      fieldTypes: ['string', 'text', 'portableText'],
+      buttonLocations: ['field'],
+      buttonAddAll: false,
+      languageDisplay: 'titleOnly',
+    }),
+    languageFilter({
+      supportedLanguages,
+      defaultLanguages: ['sv'],
+      documentTypes: localizedDocumentTypes,
+      filterField: (enclosingType, member, selectedLanguageIds) => {
+        if (
+          enclosingType.jsonType === 'object' &&
+          enclosingType.name.startsWith('internationalizedArray') &&
+          'kind' in member
+        ) {
+          const pathEnd = member.field.path.slice(-2)
+          const language =
+            pathEnd[1] === 'value' && isKeySegment(pathEnd[0]) ? pathEnd[0]._key : null
+
+          return language ? selectedLanguageIds.includes(language) : false
+        }
+
+        // Slugs are a compound field and must keep both route controls visible.
+        if (enclosingType.name === 'localeSlug') return true
+
+        if (enclosingType.jsonType === 'object' && enclosingType.name.startsWith('locale')) {
+          return selectedLanguageIds.includes(member.name)
+        }
+
+        return true
+      },
+    }),
     structureTool({
       structure,
     }),

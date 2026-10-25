@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {TagIcon} from '@sanity/icons'
+import {getLocalizedValue, hasLocalizedValue} from '../lib/localization'
 
 export const role = defineType({
   name: 'role',
@@ -10,14 +11,14 @@ export const role = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'string',
-      validation: (rule) => rule.required(),
+      type: 'internationalizedArrayString',
+      validation: (rule) =>
+        rule.custom((value) => Boolean(hasLocalizedValue(value)) || 'A Swedish title is required.'),
     }),
     defineField({
       name: 'description',
       title: 'Description',
-      type: 'text',
-      rows: 3,
+      type: 'internationalizedArrayText',
     }),
     defineField({
       name: 'section',
@@ -48,8 +49,11 @@ export const role = defineType({
       recruiting: 'recruiting',
     },
     prepare({title, section, recruiting}) {
-      const subtitle = section ?? 'No committee'
-      return {title, subtitle: recruiting ? `${subtitle} · Recruiting` : subtitle}
+      const subtitle = getLocalizedValue(section) ?? 'No committee'
+      return {
+        title: getLocalizedValue(title) ?? 'Untitled role',
+        subtitle: recruiting ? `${subtitle} · Recruiting` : subtitle,
+      }
     },
   },
 })

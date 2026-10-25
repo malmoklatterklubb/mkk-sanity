@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {validateLocalizedImageAlt} from '../lib/localization'
 
 export const seo = defineType({
   name: 'seo',
@@ -9,15 +10,12 @@ export const seo = defineType({
       name: 'title',
       title: 'SEO title',
       description: 'Overrides the page title in search results when provided.',
-      type: 'string',
-      validation: (rule) => rule.max(60).warning('Keep this under 60 characters.'),
+      type: 'internationalizedArrayString',
     }),
     defineField({
       name: 'description',
       title: 'SEO description',
-      type: 'text',
-      rows: 3,
-      validation: (rule) => rule.max(160).warning('Keep this under 160 characters.'),
+      type: 'internationalizedArrayText',
     }),
     defineField({
       name: 'image',
@@ -28,8 +26,11 @@ export const seo = defineType({
         defineField({
           name: 'alt',
           title: 'Alternative text',
-          type: 'string',
-          validation: (rule) => rule.required().warning('Add alternative text for this image.'),
+          type: 'internationalizedArrayString',
+          validation: (rule) =>
+            rule
+              .custom((value, context) => validateLocalizedImageAlt(value, context.parent))
+              .warning(),
         }),
       ],
     }),

@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {UserIcon} from '@sanity/icons'
+import {getLocalizedValue, validateLocalizedImageAlt} from '../lib/localization'
 
 export const person = defineType({
   name: 'person',
@@ -16,8 +17,7 @@ export const person = defineType({
     defineField({
       name: 'bio',
       title: 'Short bio',
-      type: 'text',
-      rows: 3,
+      type: 'internationalizedArrayText',
     }),
     defineField({
       name: 'email',
@@ -43,6 +43,17 @@ export const person = defineType({
       name: 'image',
       title: 'Image',
       type: 'image',
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative text',
+          type: 'internationalizedArrayString',
+          validation: (rule) =>
+            rule
+              .custom((value, context) => validateLocalizedImageAlt(value, context.parent))
+              .warning(),
+        }),
+      ],
     }),
   ],
   preview: {
@@ -55,7 +66,7 @@ export const person = defineType({
       role3: 'roles.3.title',
     },
     prepare({name, image, role0, role1, role2, role3}) {
-      const roles = [role0, role1, role2].filter(Boolean)
+      const roles = [role0, role1, role2].map((role) => getLocalizedValue(role)).filter(Boolean)
       const subtitle = roles.length === 0 ? 'No roles' : roles.join(', ')
 
       return {

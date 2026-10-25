@@ -10,20 +10,24 @@ export const homePage = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'string',
-      validation: (rule) => rule.required(),
-      initialValue: 'Malmö Klätterklubb',
+      type: 'internationalizedArrayString',
+      validation: (rule) =>
+        rule.custom((value) =>
+          Array.isArray(value) && value.some((item) => item._key === 'sv' && item.value) ?
+            true
+          : 'A Swedish title is required.',
+        ),
+      initialValue: [{_key: 'sv', value: 'Malmö Klätterklubb'}],
     }),
     defineField({
       name: 'introduction',
       title: 'Introduction',
-      type: 'text',
-      rows: 3,
+      type: 'internationalizedArrayText',
     }),
     defineField({
       name: 'content',
       title: 'Content',
-      type: 'portableText',
+      type: 'internationalizedArrayPortableText',
     }),
     defineField({
       name: 'seo',
