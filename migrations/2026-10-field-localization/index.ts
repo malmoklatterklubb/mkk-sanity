@@ -98,6 +98,27 @@ function localizeNavigation(value: unknown): unknown[] | undefined {
   return changed ? items : undefined
 }
 
+function localizeFooterLinkGroups(value: unknown): unknown[] | undefined {
+  if (!Array.isArray(value)) return undefined
+
+  let changed = false
+  const groups = value.map((group) => {
+    if (!isObject(group)) return group
+
+    const next = {...group}
+    const title = localize(next.title)
+
+    if (title) {
+      next.title = title
+      changed = true
+    }
+
+    return next
+  })
+
+  return changed ? groups : undefined
+}
+
 function pushLocalized(patches: ReturnType<typeof at>[], path: string, value: unknown) {
   const localized = localize(value)
   if (localized) patches.push(at(path, set(localized)))
@@ -136,6 +157,9 @@ export default defineMigration({
 
         const navigation = localizeNavigation(value.navigation)
         if (navigation) patches.push(at('navigation', set(navigation)))
+
+        const footerLinkGroups = localizeFooterLinkGroups(value.footerLinkGroups)
+        if (footerLinkGroups) patches.push(at('footerLinkGroups', set(footerLinkGroups)))
       }
 
       if (value._type === 'homePage') {

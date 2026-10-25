@@ -49,6 +49,20 @@ navigation[]{
 }
 ```
 
+Footer links are grouped by a localized title. Each group contains page links only and cannot contain nested child pages:
+
+```groq
+footerLinkGroups[]{
+  "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+  links[]{
+    "page": page->{
+      "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+      "slug": coalesce(slug[$language].current, slug.sv.current)
+    }
+  }
+}
+```
+
 ```groq
 coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value)
 ```

@@ -65,4 +65,11 @@ describe('schemaTypes', () => {
     expect(fieldType('navItem', 'page')).toBe('reference')
     expect(fieldType('navItemChild', 'page')).toBe('reference')
   })
+
+  it('supports grouped footer links without nested pages', () => {
+    expect(fieldNames('footerLinkGroup')).toEqual(['title', 'links'])
+    expect(fieldType('footerLinkGroup', 'title')).toBe('internationalizedArrayString')
+    expect(fieldType('footerLinkGroup', 'links')).toBe('array')
+    expect(fieldNames('siteSettings')).toContain('footerLinkGroups')
+  })
 })

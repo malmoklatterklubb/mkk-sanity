@@ -9,6 +9,7 @@ import {role} from './documents/role'
 import {section} from './documents/section'
 import {siteSettings} from './documents/siteSettings'
 import {seo} from './objects/seo'
+import {footerLinkGroup} from './objects/footerLinkGroup'
 
 export const schemaTypes = [
   homePage,
@@ -17,6 +18,7 @@ export const schemaTypes = [
   portableText,
   navItem,
   navItemChild,
+  footerLinkGroup,
   localeSlug,
   person,
   role,

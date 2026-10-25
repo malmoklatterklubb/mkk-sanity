@@ -53,6 +53,13 @@ export const siteSettings = defineType({
       type: 'array',
       of: [defineArrayMember({type: 'navItem'})],
     }),
+    defineField({
+      name: 'footerLinkGroups',
+      title: 'Footer link groups',
+      description: 'Organize page links into groups for the site footer.',
+      type: 'array',
+      of: [defineArrayMember({type: 'footerLinkGroup'})],
+    }),
   ],
   preview: {
     select: {title: 'siteTitle'},
