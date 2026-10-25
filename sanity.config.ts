@@ -3,6 +3,7 @@ import {languageFilter} from '@sanity/language-filter'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {internationalizedArray} from 'sanity-plugin-internationalized-array'
+import {netlifyTool} from 'sanity-plugin-netlify'
 import {schemaTypes} from './schemaTypes'
 import {localizedDocumentTypes, supportedLanguages} from './schemaTypes/lib/localization'
 import {structure} from './structure'
@@ -57,6 +58,7 @@ export default defineConfig({
         return true
       },
     }),
+    netlifyTool(),
     structureTool({
       structure,
     }),
