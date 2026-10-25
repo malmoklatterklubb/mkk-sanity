@@ -1,182 +1,74 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
-import z from 'zod'
 import {getLocalizedValue} from '../lib/localization'
 
-const contextSchema = z.object({
-  parent: z
-    .object({
-      linkType: z.string().optional(),
-    })
-    .optional(),
-})
-
-/**
- * Leaf-level nav item — can link internally or externally, but has no children.
- * Used as the array member type inside navItem.children to avoid infinite recursion.
- */
+/** A child navigation item that links to a page. */
 export const navItemChild = defineType({
   name: 'navItemChild',
-  title: 'Nav Item',
+  title: 'Navigation page',
   type: 'object',
   icon: LinkIcon,
   fields: [
     defineField({
-      name: 'label',
-      title: 'Label',
-      type: 'internationalizedArrayString',
-      validation: (rule) =>
-        rule.custom((value) => Boolean(getLocalizedValue(value)) || 'A Swedish label is required.'),
-    }),
-    defineField({
-      name: 'linkType',
-      title: 'Link Type',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Internal', value: 'internal'},
-          {title: 'External', value: 'external'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'internal',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'internalLink',
-      title: 'Internal Link',
-      description: 'Link to a document in this Sanity project.',
+      name: 'page',
+      title: 'Page',
+      description: 'Select the page to link to.',
       type: 'reference',
-      to: [{type: 'page'}, {type: 'post'}, {type: 'section'}],
-      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'internal',
-      validation: (rule) =>
-        rule.custom((value, ctx) => {
-          const parent = contextSchema.parse(ctx).parent
-          if (parent?.linkType === 'internal' && !value) return 'Required'
-          return true
-        }),
-    }),
-    defineField({
-      name: 'externalUrl',
-      title: 'URL',
-      description: 'A relative URL, e.g. /about or /news/latest.',
-      type: 'string',
-      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'external',
-      validation: (rule) =>
-        rule.custom((value, ctx) => {
-          const parent = contextSchema.parse(ctx).parent
-          if (parent?.linkType !== 'external') return true
-          if (!value) return 'Required'
-          if (!/^\//.test(value)) return 'Must be a relative URL starting with /'
-          return true
-        }),
+      to: [{type: 'page'}],
+      validation: (rule) => rule.required(),
     }),
   ],
   preview: {
     select: {
-      title: 'label',
-      linkType: 'linkType',
-      externalUrl: 'externalUrl',
-      internalTitle: 'internalLink.title',
+      title: 'page.title',
+      slug: 'page.slug.sv.current',
     },
-    prepare({title, linkType, externalUrl, internalTitle}) {
-      const subtitle =
-        linkType === 'external' ? externalUrl
-        : getLocalizedValue(internalTitle) ? `→ ${getLocalizedValue(internalTitle)}`
-        : 'Internal link'
-      return {title: getLocalizedValue(title) ?? 'Untitled navigation item', subtitle}
+    prepare({title, slug}) {
+      return {
+        title: getLocalizedValue(title) ?? 'Untitled page',
+        subtitle: slug ? `/${slug}` : 'No slug',
+      }
     },
   },
 })
 
-/**
- * Top-level nav item — can link internally, externally, or act as a group
- * (no direct link) with nested child items.
- */
+/** A top-level navigation page with optional nested child pages. */
 export const navItem = defineType({
   name: 'navItem',
-  title: 'Nav Item',
+  title: 'Navigation page',
   type: 'object',
   icon: LinkIcon,
   fields: [
     defineField({
-      name: 'label',
-      title: 'Label',
-      type: 'internationalizedArrayString',
-      validation: (rule) =>
-        rule.custom((value) => Boolean(getLocalizedValue(value)) || 'A Swedish label is required.'),
-    }),
-    defineField({
-      name: 'linkType',
-      title: 'Link Type',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Internal', value: 'internal'},
-          {title: 'External', value: 'external'},
-          {title: 'No link (group only)', value: 'none'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'internal',
+      name: 'page',
+      title: 'Page',
+      description: 'Select the page to link to.',
+      type: 'reference',
+      to: [{type: 'page'}],
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'internalLink',
-      title: 'Internal Link',
-      description: 'Link to a document in this Sanity project.',
-      type: 'reference',
-      to: [{type: 'page'}, {type: 'post'}, {type: 'section'}],
-      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'internal',
-      validation: (rule) =>
-        rule.custom((value, ctx) => {
-          const parent = contextSchema.parse(ctx).parent
-          if (parent?.linkType === 'internal' && !value) return 'Required'
-          return true
-        }),
-    }),
-    defineField({
-      name: 'externalUrl',
-      title: 'URL',
-      description: 'A relative URL, e.g. /about or /news/latest.',
-      type: 'string',
-      hidden: (ctx) => contextSchema.parse(ctx).parent?.linkType !== 'external',
-      validation: (rule) =>
-        rule.custom((value, ctx) => {
-          const parent = contextSchema.parse(ctx).parent
-          if (parent?.linkType !== 'external') return true
-          if (!value) return 'Required'
-          if (!/^\//.test(value)) return 'Must be a relative URL starting with /'
-          return true
-        }),
-    }),
-    defineField({
       name: 'children',
-      title: 'Sub-items',
-      description: 'Optional nested navigation items (one level deep).',
+      title: 'Sub-pages',
+      description: 'Optional nested pages shown under this navigation page.',
       type: 'array',
       of: [defineArrayMember({type: 'navItemChild'})],
     }),
   ],
   preview: {
     select: {
-      title: 'label',
-      linkType: 'linkType',
-      externalUrl: 'externalUrl',
-      internalTitle: 'internalLink.title',
+      title: 'page.title',
+      slug: 'page.slug.sv.current',
       children: 'children',
     },
-    prepare({title, linkType, externalUrl, internalTitle, children}) {
+    prepare({title, slug, children}) {
       const childCount = Array.isArray(children) ? children.length : 0
-      const childSuffix =
-        childCount > 0 ? ` (${childCount} sub-item${childCount === 1 ? '' : 's'})` : ''
+      const subtitle = slug ? `/${slug}` : 'No slug'
 
-      const subtitle =
-        linkType === 'none' ? `Group${childSuffix}`
-        : linkType === 'external' ? `${externalUrl ?? ''}${childSuffix}`
-        : `${getLocalizedValue(internalTitle) ? `→ ${getLocalizedValue(internalTitle)}` : 'Internal link'}${childSuffix}`
-
-      return {title: getLocalizedValue(title) ?? 'Untitled navigation item', subtitle}
+      return {
+        title: getLocalizedValue(title) ?? 'Untitled page',
+        subtitle: childCount > 0 ? `${subtitle} · ${childCount} sub-pages` : subtitle,
+      }
     },
   },
 })

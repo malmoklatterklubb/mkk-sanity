@@ -58,4 +58,11 @@ describe('schemaTypes', () => {
     expect(fieldType('section', 'description')).toBe('internationalizedArrayPortableText')
     expect(fieldType('role', 'title')).toBe('internationalizedArrayString')
   })
+
+  it('limits site navigation to pages with optional nested pages', () => {
+    expect(fieldNames('navItem')).toEqual(['page', 'children'])
+    expect(fieldNames('navItemChild')).toEqual(['page'])
+    expect(fieldType('navItem', 'page')).toBe('reference')
+    expect(fieldType('navItemChild', 'page')).toBe('reference')
+  })
 })

@@ -28,7 +28,26 @@ Portable Text supports paragraphs, headings, lists, quotes, internal and externa
 
 ## Localized Fields
 
-Visitor-facing strings, text, Portable Text, SEO copy, navigation labels, image alternative text, captions, and route slugs use `sanity-plugin-internationalized-array`. Swedish is the default language and English is optional.
+Visitor-facing strings, text, Portable Text, SEO copy, image alternative text, captions, and route slugs use `sanity-plugin-internationalized-array`. Swedish is the default language and English is optional. Site navigation derives its labels from referenced pages and supports one level of nested page links.
+
+Navigation items reference pages directly; they do not store labels or external URLs:
+
+```groq
+navigation[]{
+  "page": page->{
+    _id,
+    "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+    "slug": coalesce(slug[$language].current, slug.sv.current)
+  },
+  children[]{
+    "page": page->{
+      _id,
+      "title": coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value),
+      "slug": coalesce(slug[$language].current, slug.sv.current)
+    }
+  }
+}
+```
 
 ```groq
 coalesce(title[_key == $language][0].value, title[_key == "sv"][0].value)
