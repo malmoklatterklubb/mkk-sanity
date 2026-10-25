@@ -34,3 +34,20 @@ npx sanity migrations run 2026-10-field-localization --no-dry-run
 The migration retains legacy `body` fields while copying their Portable Text into localized `content`, so the earlier content-architecture migration can be completed independently.
 
 English slug values remain empty. An English route must not be enabled until an editor deliberately adds an English slug.
+
+## Upgrade To `sanity-plugin-internationalized-array` v5
+
+Version 5 stores each language in a dedicated `language` field instead of using the array item's `_key`. Create and verify a current production backup before running this migration:
+
+```sh
+npx sanity dataset export production ./backups/production-before-i18n-array-v5.tar.gz
+npx sanity migrations run 2026-10-i18n-array-v5
+```
+
+After reviewing the dry run, execute it:
+
+```sh
+npx sanity migrations run 2026-10-i18n-array-v5 --no-dry-run
+```
+
+The migration preserves localized values and generates new array keys. GROQ examples in `docs/querying.md` remain backwards-compatible during the transition.

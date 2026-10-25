@@ -18,14 +18,12 @@
   },
   "dependencies": {
     "@sanity/icons": "^3.7.4",
-    "@sanity/language-filter": "^5.0.20",
-    "@sanity/locale-sv-se": "^1.2.30",
-    "@sanity/vision": "^5.31.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "sanity": "^5.31.1",
-    "sanity-plugin-internationalized-array": "^4.0.8",
-    "sanity-plugin-netlify": "^1.4.0",
+    "@sanity/language-filter": "5.0.23",
+    "@sanity/vision": "6.20.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sanity": "6.20.0",
+    "sanity-plugin-internationalized-array": "5.3.7",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {

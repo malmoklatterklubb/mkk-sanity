@@ -13,11 +13,14 @@ export const homePage = defineType({
       type: 'internationalizedArrayString',
       validation: (rule) =>
         rule.custom((value) =>
-          Array.isArray(value) && value.some((item) => item._key === 'sv' && item.value) ?
+          (
+            Array.isArray(value) &&
+            value.some((item) => (item.language ?? item._key) === 'sv' && item.value)
+          ) ?
             true
           : 'A Swedish title is required.',
         ),
-      initialValue: [{_key: 'sv', value: 'Malmö Klätterklubb'}],
+      initialValue: [{_key: 'sv', language: 'sv', value: 'Malmö Klätterklubb'}],
     }),
     defineField({
       name: 'introduction',

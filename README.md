@@ -76,6 +76,8 @@ npx sanity migrations run 2026-04-content-architecture
 
 See [`migrations/README.md`](migrations/README.md) for the required manual steps when changing document types, and [`migrations/field-localization.md`](migrations/field-localization.md) before running the field-localization migration.
 
+The Sanity 6 upgrade also requires the `sanity-plugin-internationalized-array` v5 data migration described in [`migrations/field-localization.md`](migrations/field-localization.md). Run it only after creating and verifying a production backup.
+
 ---
 
 ## Continuous Deployment

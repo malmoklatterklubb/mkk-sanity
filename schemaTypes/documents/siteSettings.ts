@@ -13,7 +13,10 @@ export const siteSettings = defineType({
       type: 'internationalizedArrayString',
       validation: (rule) =>
         rule.custom((value) =>
-          Array.isArray(value) && value.some((item) => item._key === 'sv' && item.value) ?
+          (
+            Array.isArray(value) &&
+            value.some((item) => (item.language ?? item._key) === 'sv' && item.value)
+          ) ?
             true
           : 'A Swedish site title is required.',
         ),
@@ -65,7 +68,9 @@ export const siteSettings = defineType({
     select: {title: 'siteTitle'},
     prepare({title}) {
       const localizedTitle =
-        Array.isArray(title) ? title.find((item) => item._key === 'sv')?.value : title
+        Array.isArray(title) ?
+          title.find((item) => (item.language ?? item._key) === 'sv')?.value
+        : title
       return {title: localizedTitle ?? 'Site Settings'}
     },
   },

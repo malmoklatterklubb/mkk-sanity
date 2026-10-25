@@ -1,9 +1,11 @@
-import {defineConfig, isKeySegment} from 'sanity'
+import {defineConfig} from 'sanity'
 import {languageFilter} from '@sanity/language-filter'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
-import {internationalizedArray} from 'sanity-plugin-internationalized-array'
-import {netlifyTool} from 'sanity-plugin-netlify'
+import {
+  internationalizedArray,
+  internationalizedArrayLanguageFilter,
+} from 'sanity-plugin-internationalized-array'
 import {schemaTypes} from './schemaTypes'
 import {localizedDocumentTypes, supportedLanguages} from './schemaTypes/lib/localization'
 import {structure} from './structure'
@@ -35,17 +37,15 @@ export default defineConfig({
       supportedLanguages,
       defaultLanguages: ['sv'],
       documentTypes: localizedDocumentTypes,
-      filterField: (enclosingType, member, selectedLanguageIds) => {
-        if (
-          enclosingType.jsonType === 'object' &&
-          enclosingType.name.startsWith('internationalizedArray') &&
-          'kind' in member
-        ) {
-          const pathEnd = member.field.path.slice(-2)
-          const language =
-            pathEnd[1] === 'value' && isKeySegment(pathEnd[0]) ? pathEnd[0]._key : null
-
-          return language ? selectedLanguageIds.includes(language) : false
+      filterField: (enclosingType, member, selectedLanguageIds, parentValue) => {
+        if (enclosingType.name.startsWith('internationalizedArray')) {
+          return internationalizedArrayLanguageFilter(
+            enclosingType,
+            member,
+            selectedLanguageIds,
+            parentValue,
+            supportedLanguages,
+          )
         }
 
         // Slugs are a compound field and must keep both route controls visible.
@@ -58,7 +58,6 @@ export default defineConfig({
         return true
       },
     }),
-    netlifyTool(),
     structureTool({
       structure,
     }),
